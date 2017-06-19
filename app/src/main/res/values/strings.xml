@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">知天气</string>
+    <string name="app_name">懂天气</string>
     <string name="slogan">天气尽在"掌握"之中！</string>
 
     <string name="refreshing">正在更新…</string>
