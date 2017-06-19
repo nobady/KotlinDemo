@@ -8,12 +8,6 @@ import java.util.*
  */
 class Constants {
 
-    init {
-        for (index in WEATHERS.indices) {
-            sWeatherIcons.put(WEATHERS[index], ICONS_ID[index])
-        }
-    }
-
     companion object {
         //SharedPreferences KEY
         val ALARM_ALLOW = "ALARM_ALLOW"
@@ -47,6 +41,12 @@ class Constants {
                                           R.mipmap.weather_rain, R.mipmap.weather_snow,
                                           R.mipmap.weather_wind, R.mipmap.weather_haze,
                                           R.mipmap.weather_rain_snow)
+
+        fun inits(){
+            for (index in WEATHERS.indices) {
+                sWeatherIcons.put(WEATHERS[index], ICONS_ID[index])
+            }
+        }
 
         fun getSchedule(which : Int) : Long {
             return SCHEDULES[which]

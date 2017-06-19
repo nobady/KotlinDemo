@@ -1,6 +1,7 @@
 package com.afsw.kotlindemo.contract
 
 import android.content.Context
+import android.util.Log
 import com.afsw.kotlindemo.base.BasePresenter
 import com.afsw.kotlindemo.base.BaseView
 import com.afsw.kotlindemo.bean.BasicEntity
@@ -57,12 +58,22 @@ interface MainContract {
             mCompositeDisposable!!.add(weatherModel.updateWeather(mLocationId))
         }
 
+        fun getDefaultWeather(){
+            val weatherBean = weatherModel.getDefaultWeather()
+
+            weatherBean?.let {
+                Log.e("TAG","Bean = $it")
+                onWeatherBean(it)
+            }
+
+        }
+
         /**
          * 如果参数为null，说明更新失败
          * 如果不为null，就显示出来
          */
-        fun onWeatherBean(weatherBean : WeatherBean?) {
-            weatherBean?:let { view!!.setRefreshing(false) }
+         fun onWeatherBean(weatherBean : WeatherBean?) {
+            weatherBean?:let { view?.setRefreshing(false) }
             weatherBean?.let { (cityId, basic, aqi, hoursForecast, dailyForecast, lifeIndex) ->
 
                 val isLocationCity = cityId.equals(

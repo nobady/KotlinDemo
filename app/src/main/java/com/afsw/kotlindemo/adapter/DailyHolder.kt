@@ -17,9 +17,12 @@ class DailyHolder(itemView:View): RecyclerView.ViewHolder(itemView) {
 
     val rootView = itemView.findViewById(R.id.ll_daily) as LinearLayout
     val inflater:LayoutInflater = LayoutInflater.from(rootView.context)
+    val titleTv = itemView.findViewById(R.id.guide_title) as TextView
 
     fun onBind(datas:MutableList<DailyForecastEntity>){
         rootView.removeAllViews()
+
+        titleTv.text = "未来天气"
 
         for ((_, temp_range, weather, week) in datas) {
             val view = inflater.inflate(R.layout.item_daily_forecast, null)
@@ -32,6 +35,8 @@ class DailyHolder(itemView:View): RecyclerView.ViewHolder(itemView) {
             statusTv.text = weather
             tempTv.text = temp_range
             iconIv.setImageResource(Constants.getIconId(weather))
+
+            rootView.addView(view)
         }
     }
 

@@ -1,5 +1,7 @@
 package com.afsw.kotlindemo.ui
 
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
 import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
 import android.graphics.Rect
@@ -59,19 +61,22 @@ class MainActivity : BaseMvpActivity<MainContract.View, MainContract.Presenter>(
     /*记录显示天气信息的控件的X坐标，用于在AppBar滚动的时候，控件动画显示*/
     private var mWeatherInfoContainerX : Float = 0.toFloat()
     private var mPresentageShowOfTitle : Float = DEFAULT_PRESENTAG
-
+    /*加载天气时，刷新按钮的动画*/
     private lateinit var mActionRotate : ObjectAnimator
+    /*加载成功时，显示时间文本的动画*/
     private var mSuccessAnimator : ValueAnimator? = null
+    /*定位图标*/
     private var mLocationDrawable : Drawable? = null
-
+    /*未来小时的adapter*/
     private lateinit var hoursAdapter : HoursForecastAdapter
-
+    /*显示温度*/
     private var mTemprature : String? = ""
-    private var mWeatherStatus:String = ""
+    /*显示天气情况*/
+    private var mWeatherStatus : String = ""
 
-    private lateinit var cityFragment:CityFragment
-    private lateinit var weatherFragment:WeatherFragment
-    private lateinit var userFragment:UserFragment
+    private lateinit var cityFragment : CityFragment
+    private lateinit var weatherFragment : WeatherFragment
+    private lateinit var userFragment : UserFragment
 
     override fun createPresenter() : MainContract.Presenter {
         return MainContract.Presenter()
@@ -84,10 +89,11 @@ class MainActivity : BaseMvpActivity<MainContract.View, MainContract.Presenter>(
         initView()
 
         setViews()
-
         presenter.init(this)
-    }
 
+        presenter.getDefaultWeather()
+    }
+    /*初始化*/
     private fun initView() {
         mTitleIcon = title_icon
         mTitleTemp = title_temp
@@ -105,11 +111,11 @@ class MainActivity : BaseMvpActivity<MainContract.View, MainContract.Presenter>(
         mLocationTv = main_location
         mPostTimeTv = main_post_time
     }
-
+    /*设置view的属性*/
     private fun setViews() {
         setSupportActionBar(mToolbar)
         mToolbar.navigationIcon = null
-       supportActionBar?.title = ""
+        supportActionBar?.title = ""
         mAppBarLayout.addOnOffsetChangedListener { appBarLayout, verticalOffset ->
             var totalScrollRange = appBarLayout.totalScrollRange
             var percent = (Math.abs(verticalOffset) / totalScrollRange).toFloat()
@@ -128,9 +134,8 @@ class MainActivity : BaseMvpActivity<MainContract.View, MainContract.Presenter>(
             }
         }
 
-        mActionRotate = ObjectAnimator()
-        mActionRotate.target = mRefreshStatus
-        mActionRotate.propertyName = "rotation"
+
+        mActionRotate = ObjectAnimator.ofFloat(mRefreshStatus, "rotation", 0f, 360f)
         mActionRotate.repeatCount = -1
         mActionRotate.duration = ROTATION_DURATION.toLong()
 
@@ -138,7 +143,9 @@ class MainActivity : BaseMvpActivity<MainContract.View, MainContract.Presenter>(
         mLocationDrawable!!.bounds = Rect(0, 0, UIUtil.dipToPx(this, R.dimen.common_location_size),
                                           UIUtil.dipToPx(this, R.dimen.common_location_size))
 
-        //        mSuccessAnimator = ValueAnimator.ofFloat()
+        mSuccessAnimator = ObjectAnimator.ofFloat(mPostTimeTv, "scaleX", 1f, 0f, 1f)
+        mSuccessAnimator?.duration = POSITIME_DURATION.toLong()
+        mSuccessAnimator?.startDelay = ROTATION_DURATION.toLong()
 
     }
 
@@ -154,18 +161,21 @@ class MainActivity : BaseMvpActivity<MainContract.View, MainContract.Presenter>(
     }
 
     /**
-     * 设置viewpager
+     * 设置viewpager，包含三个fragment
+     * 一个已选择城市的管理，一个显示天气情况，一个是个人信息
      */
     private fun setupViewpager() {
+
+
         var pagerAdapter : MainPageAdapter = MainPageAdapter(this, supportFragmentManager)
 
-         cityFragment = CityFragment.newInstance()
+        cityFragment = CityFragment.newInstance()
         pagerAdapter.addFrag(cityFragment)
 
-         weatherFragment = WeatherFragment.newInstance()
+        weatherFragment = WeatherFragment.newInstance()
         pagerAdapter.addFrag(weatherFragment)
 
-         userFragment = UserFragment.newInstance()
+        userFragment = UserFragment.newInstance()
         pagerAdapter.addFrag(userFragment)
 
         mViewPager.adapter = pagerAdapter
@@ -177,6 +187,7 @@ class MainActivity : BaseMvpActivity<MainContract.View, MainContract.Presenter>(
 
         mViewPager.offscreenPageLimit = 3
         mViewPager.currentItem = 1
+
     }
 
     private fun handleInfoAnimate(percent : Float) {
@@ -199,37 +210,43 @@ class MainActivity : BaseMvpActivity<MainContract.View, MainContract.Presenter>(
                 mFloatAction.hide()
             }
         } else {
-            if (!mFloatAction.isShown) {
+            if (!mFloatAction.isShown && !mActionRotate.isRunning) {
                 mFloatAction.show()
             }
             mTitleIcon.setImageDrawable(null)
             mTitleTemp.text = ""
         }
     }
-
+    /*定位失败，弹出toast ，然后跳转到城市列表里进行选择*/
     override fun locationFail() {
         toast(getString(R.string.located_failed), Toast.LENGTH_SHORT)
         //跳转到城市列表页面
+
     }
 
+    /**
+     * 设置刷新时的状态
+     * @param isRefresh true  正在更新，false 更新失败
+     */
     override fun setRefreshing(isRefresh : Boolean) {
         if (isRefresh) {
             mPostTimeTv.text = getString(R.string.refreshing)
             mRefreshStatus.visibility = View.VISIBLE
-//            mActionRotate.start()
+            mActionRotate.start()
             mFloatAction.hide()
         } else {
             mPostTimeTv.text = getString(R.string.refresh_fail)
             stopRefresh()
         }
     }
-
+    /*停止刷新*/
     fun stopRefresh() {
-//        mActionRotate.end()
+        mActionRotate.end()
         mRefreshStatus.visibility = View.GONE
         mFloatAction.show()
     }
 
+    /*设置当天的天气、温度，城市名等*/
     override fun onBasicInfo(basicEntity : BasicEntity,
                              hoursForecast : MutableList<HoursForecastEntity>,
                              isLocationCity : Boolean) {
@@ -244,21 +261,47 @@ class MainActivity : BaseMvpActivity<MainContract.View, MainContract.Presenter>(
         mMainTemp.text = mTemprature
         mMainInfoTv.text = mWeatherStatus
 
-        mPostTimeTv.text = getString(R.string.refresh_succeed)
+        updateSuccess("${TimeUtil.getTimeTips(basicEntity.time)} 发布")
 
-        if (TimeUtil.isNight()){
-            if (Constants.sunny(mWeatherStatus)){
+        if (TimeUtil.isNight()) {
+            if (Constants.sunny(mWeatherStatus)) {
                 mMainBgIv.setImageResource(R.mipmap.bg_night)
-            }else{
+            } else {
                 mMainBgIv.setImageResource(R.mipmap.bg_night_dark)
             }
-        }else{
+        } else {
             mMainBgIv.setImageResource(R.mipmap.bg_day)
         }
     }
+    /*更新成功后，使用动画设置发布时间*/
+    private fun updateSuccess(time : String) {
+        mSuccessAnimator?.addListener(object : AnimatorListenerAdapter() {
+            override fun onAnimationStart(animation : Animator?) {
+                stopRefresh()
+                mPostTimeTv.setText(R.string.refresh_succeed)
+            }
+        })
 
+        mSuccessAnimator?.addUpdateListener {
+            val fraction = it.animatedFraction
+            if (fraction>=0.5f){
+                mPostTimeTv.text = time
+            }
+        }
+        mSuccessAnimator?.start()
+    }
+
+    /*显示未来天气、空气质量、生活指数*/
     override fun onMoreInfo(aqi : WeatherBean?) {
         weatherFragment.onMoreInfo(aqi)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        mSuccessAnimator?.removeAllListeners()
+        mActionRotate.removeAllListeners()
+        mSuccessAnimator?.removeAllUpdateListeners()
+        mActionRotate.removeAllUpdateListeners()
     }
 }
 

@@ -45,7 +45,7 @@ class PreferenceUtil private constructor(){
         return preferences!!.getString(key, defaultVal)
     }
 
-    fun getString(key : String) : String {
+    fun getString(key : String) : String? {
         return preferences!!.getString(key, null)
     }
 

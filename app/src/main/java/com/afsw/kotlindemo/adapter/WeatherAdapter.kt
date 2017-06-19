@@ -10,6 +10,9 @@ import com.afsw.kotlindemo.bean.WeatherBean
  * Created by tengfei.lv on 2017/6/14.
  */
 class WeatherAdapter:RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+    override fun getItemCount() : Int {
+        return 3
+    }
 
     var weatherBean:WeatherBean? = null
 
@@ -30,7 +33,6 @@ class WeatherAdapter:RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     override fun onBindViewHolder(holder : RecyclerView.ViewHolder?, position : Int) {
 
         weatherBean?:let { return }
-
         if (holder is DailyHolder){
             holder.onBind(weatherBean!!.dailyForecast)
         }else if (holder is AqiHolder){
@@ -40,7 +42,6 @@ class WeatherAdapter:RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         }
     }
 
-    override fun getItemCount() : Int  = 3
 
     override fun getItemViewType(position : Int) : Int {
         when(position){
@@ -48,6 +49,6 @@ class WeatherAdapter:RecyclerView.Adapter<RecyclerView.ViewHolder>() {
             1-> return R.layout.item_aqi
             2-> return R.layout.item_life
         }
-        return super.getItemViewType(position)
+        return 0
     }
 }

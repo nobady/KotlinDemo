@@ -10,11 +10,10 @@ import android.view.ViewGroup
  */
 abstract class BaseMvpFragment<V:BaseView,P : BasePresenter<V>> : BaseFragment(), BaseView {
 
-    protected lateinit var presenter : P
+    protected  var presenter : P = createPresenter()
 
     override fun onCreateView(inflater : LayoutInflater?, container : ViewGroup?,
                               savedInstanceState : Bundle?) : View? {
-        presenter = createPresenter()
 
         presenter.attachView(this as V)
 

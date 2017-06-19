@@ -1,5 +1,7 @@
 package com.afsw.kotlindemo.adapter
 
+import android.animation.Animator
+import android.animation.ObjectAnimator
 import android.support.v7.widget.RecyclerView
 import android.text.SpannableString
 import android.text.Spanned
@@ -18,41 +20,62 @@ import com.silencedut.expandablelayout.ExpandableLayout
 /**
  * Created by tengfei.lv on 2017/6/15.
  */
-class AqiHolder(itemView:View):RecyclerView.ViewHolder(itemView) {
+class AqiHolder(itemView : View) : RecyclerView.ViewHolder(itemView) {
 
-
-
-    companion object{
+    companion object {
         val AQI_LEVELS = intArrayOf(50, 100, 150, 200, 300, 500)
         val PM2_5_LEVEL = intArrayOf(35, 75, 115, 150, 250, 500)
         val PM10_LEVELS = intArrayOf(50, 150, 250, 350, 420, 600)
     }
 
-    val aqiView = itemView.findViewById(R.id.aqi_view) as LevelView
-    val aqiValue = itemView.findViewById(R.id.aqi_value) as TextView
-    val aqiQuality = itemView.findViewById(R.id.aqi_quality) as TextView
-    val dateCase = itemView.findViewById(R.id.date_case) as LinearLayout
-    val expandIcon = itemView.findViewById(R.id.expand_icon) as ImageView
-    val baseInfo = itemView.findViewById(R.id.base_info) as LinearLayout
-    val pm2_5View = itemView.findViewById(R.id.pm2_5_view) as LevelView
-    val pm2_5Value = itemView.findViewById(R.id.pm2_5_value) as TextView
-    val pm10View = itemView.findViewById(R.id.pm10_view) as LevelView
-    val pm10Value = itemView.findViewById(R.id.pm10_value) as TextView
-    val aqiAdvice = itemView.findViewById(R.id.aqi_advice) as TextView
-    val expandableLayout = itemView.findViewById(R.id.expandable_layout) as ExpandableLayout
-    val rank = itemView.findViewById(R.id.rank) as TextView
+    var expandableLayout : ExpandableLayout = itemView.findViewById(R.id.expandable_layout) as ExpandableLayout
+    var aqiView : LevelView = itemView.findViewById(R.id.aqi_view) as LevelView
+    var aqiValue : TextView = itemView.findViewById(R.id.aqi_value) as TextView
+    var aqiQuality : TextView = itemView.findViewById(R.id.aqi_quality) as TextView
+    var dateCase : LinearLayout = itemView.findViewById(R.id.date_case) as LinearLayout
+    var expandIcon : ImageView = itemView.findViewById(R.id.expand_icon) as ImageView
+    var baseInfo : LinearLayout = itemView.findViewById(R.id.base_info) as LinearLayout
+    var pm2_5View : LevelView = itemView.findViewById(R.id.pm2_5_view) as LevelView
+    var pm2_5Value : TextView = itemView.findViewById(R.id.pm2_5_value) as TextView
+    var pm10View : LevelView = itemView.findViewById(R.id.pm10_view) as LevelView
+    var pm10Value : TextView = itemView.findViewById(R.id.pm10_value) as TextView
+    var aqiAdvice : TextView = itemView.findViewById(R.id.aqi_advice) as TextView
+    var rank : TextView = itemView.findViewById(R.id.rank) as TextView
+    var titleTv = itemView.findViewById(R.id.guide_title) as TextView
+
+    /*图标展开和关闭的动画*/
+    var iconDownAnimator:Animator
+    var iconUpAnimator:Animator
+    /*标记ExpandableLayout是否是展开状态*/
+    var isExpand:Boolean = false
 
     init {
         aqiView.setAQI_LEVELS(AQI_LEVELS)
         pm2_5View.setAQI_LEVELS(PM2_5_LEVEL)
         pm10View.setAQI_LEVELS(PM10_LEVELS)
+
+        titleTv.text = "空气质量指数(AQI)"
+
+        iconDownAnimator = generateAnimator(expandIcon,0f,180f)
+        iconUpAnimator = generateAnimator(expandIcon,180f,0f)
+
+        expandableLayout.setOnExpandListener { isExpand = it }
+
+        expandableLayout.setOnClickListener {
+            if (!isExpand){
+                iconDownAnimator.start()
+            }else{
+                iconUpAnimator.start()
+            }
+        }
+
     }
 
-    fun updateItem(aqiEntity : AqiEntity){
+    fun updateItem(aqiEntity : AqiEntity) {
 
-        upDataLevel(aqiView,aqiValue,aqiEntity.aqi.toInt())
-        upDataLevel(pm2_5View,pm2_5Value,aqiEntity.pm25.toInt())
-        upDataLevel(pm10View,pm10Value,aqiEntity.pm10.toInt())
+        upDataLevel(aqiView, aqiValue, aqiEntity.aqi.toInt())
+        upDataLevel(pm2_5View, pm2_5Value, aqiEntity.pm25.toInt())
+        upDataLevel(pm10View, pm10Value, aqiEntity.pm10.toInt())
 
         aqiAdvice.text = aqiEntity.advice
         aqiQuality.text = aqiEntity.quality
@@ -66,13 +89,16 @@ class AqiHolder(itemView:View):RecyclerView.ViewHolder(itemView) {
         rank.text = rankSpannable
     }
 
-    private fun upDataLevel(levelView : LevelView,valueTv:TextView,value:Int){
+    private fun upDataLevel(levelView : LevelView, valueTv : TextView, value : Int) {
         levelView.setCurrentValue(value)
         valueTv.text = value.toString()
         valueTv.setTextColor(levelView.getSectionColor())
     }
 
-
-
+    private fun generateAnimator(target:View,start:Float,end:Float):Animator{
+        val animator = ObjectAnimator.ofFloat(target, "rotation", start, end)
+        animator.duration = 300
+        return animator
+    }
 
 }
