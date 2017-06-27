@@ -30,6 +30,7 @@ import com.afsw.kotlindemo.ui.fragment.CityFragment
 import com.afsw.kotlindemo.ui.fragment.UserFragment
 import com.afsw.kotlindemo.ui.fragment.WeatherFragment
 import com.afsw.kotlindemo.utils.Constants
+import com.afsw.kotlindemo.utils.PreferenceUtil
 import com.afsw.kotlindemo.utils.TimeUtil
 import com.afsw.kotlindemo.utils.UIUtil
 import kotlinx.android.synthetic.main.activity_main.*
@@ -147,6 +148,8 @@ class MainActivity : BaseMvpActivity<MainContract.View, MainContract.Presenter>(
         mSuccessAnimator?.duration = POSITIME_DURATION.toLong()
         mSuccessAnimator?.startDelay = ROTATION_DURATION.toLong()
 
+        mFloatAction.setOnClickListener { presenter.updateDefaultWeather() }
+
     }
 
     /**
@@ -165,7 +168,6 @@ class MainActivity : BaseMvpActivity<MainContract.View, MainContract.Presenter>(
      * 一个已选择城市的管理，一个显示天气情况，一个是个人信息
      */
     private fun setupViewpager() {
-
 
         var pagerAdapter : MainPageAdapter = MainPageAdapter(this, supportFragmentManager)
 
@@ -260,6 +262,9 @@ class MainActivity : BaseMvpActivity<MainContract.View, MainContract.Presenter>(
         mLocationTv.text = basicEntity.city
         mMainTemp.text = mTemprature
         mMainInfoTv.text = mWeatherStatus
+
+        PreferenceUtil.get().putString(Constants.CURR_CITY,basicEntity.city)
+        PreferenceUtil.get().apply()
 
         updateSuccess("${TimeUtil.getTimeTips(basicEntity.time)} 发布")
 

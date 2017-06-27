@@ -22,6 +22,8 @@ class Constants {
         val FOLLOWED_CITIES = "FOLLOWED_CITIES"
         val DEFAULT_CITY_ID = "101220901"//亳州CityId
 
+        val CURR_CITY : String = "curr_city"
+
         val DEFAULT_STR = "$"
 
         val CITY_IN_DB = "city_in_db"
@@ -42,7 +44,10 @@ class Constants {
                                           R.mipmap.weather_wind, R.mipmap.weather_haze,
                                           R.mipmap.weather_rain_snow)
 
-        fun inits(){
+        val FRAGMENT_CITY_BG_ID = intArrayOf(R.mipmap.blur0, R.mipmap.blur1, R.mipmap.blur2,
+                                             R.mipmap.blur3, R.mipmap.blur4, R.mipmap.blur5)
+
+        fun inits() {
             for (index in WEATHERS.indices) {
                 sWeatherIcons.put(WEATHERS[index], ICONS_ID[index])
             }
@@ -76,6 +81,7 @@ class Constants {
 
             return R.mipmap.weather_none_available
         }
+
     }
 
 }

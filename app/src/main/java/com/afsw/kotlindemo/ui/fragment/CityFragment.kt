@@ -3,19 +3,23 @@ package com.afsw.kotlindemo.ui.fragment
 import android.os.Bundle
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.afsw.kotlindemo.R
 import com.afsw.kotlindemo.adapter.CityAdapter
 import com.afsw.kotlindemo.base.BaseMvpFragment
+import com.afsw.kotlindemo.bean.SelectCityBean
 import com.afsw.kotlindemo.contract.CityContract
 
 /**
  * 显示已经选择的城市，已经选择的城市在数据库中保存
  * Created by tengfei.lv on 2017/6/12.
  */
-class CityFragment: BaseMvpFragment<CityContract.View,CityContract.Presenter>() {
+class CityFragment: BaseMvpFragment<CityContract.View,CityContract.Presenter>(),CityContract.View {
+
+    override fun getLayoutId() : Int = R.layout.fragment_city
 
     companion object{
         fun newInstance():CityFragment{
@@ -24,6 +28,7 @@ class CityFragment: BaseMvpFragment<CityContract.View,CityContract.Presenter>() 
     }
 
     private lateinit var mRecyclerView:RecyclerView
+    private lateinit var mAdapter:CityAdapter
 
     override fun createPresenter() : CityContract.Presenter {
         return CityContract.Presenter()
@@ -31,8 +36,8 @@ class CityFragment: BaseMvpFragment<CityContract.View,CityContract.Presenter>() 
 
     override fun onCreateView(inflater : LayoutInflater?, container : ViewGroup?,
                               savedInstanceState : Bundle?) : View? {
-        val view = inflater!!.inflate(R.layout.fragment_city, container, false)
-        mRecyclerView = view.findViewById(R.id.recyclerView) as RecyclerView
+        val view = super.onCreateView(inflater, container, savedInstanceState)
+        mRecyclerView = view?.findViewById(R.id.recyclerView) as RecyclerView
         return view
     }
 
@@ -42,7 +47,17 @@ class CityFragment: BaseMvpFragment<CityContract.View,CityContract.Presenter>() 
         mRecyclerView.setHasFixedSize(true)
         mRecyclerView.setBackgroundResource(R.color.main_background)
 
-        var adapter:CityAdapter = CityAdapter()
-        mRecyclerView.adapter = adapter
+        Log.e("TAG", "onViewCreated")
+        mAdapter = CityAdapter()
+        mRecyclerView.adapter = mAdapter
+
+        presenter.findSaveCity()
+    }
+
+    override fun showDatas(selectCityBeanList : MutableList<SelectCityBean>) {
+        Log.e("TAG", "显示")
+        selectCityBeanList.add(SelectCityBean("0","","","",0))
+        mAdapter.datas = selectCityBeanList
+        mAdapter.notifyDataSetChanged()
     }
 }

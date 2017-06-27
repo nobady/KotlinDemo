@@ -1,5 +1,6 @@
 package com.afsw.kotlindemo.model
 
+import android.util.Log
 import com.afsw.kotlindemo.bean.WeatherBean
 import com.afsw.kotlindemo.contract.MainContract
 import com.afsw.kotlindemo.net.RetrofitClient
@@ -21,6 +22,7 @@ class WeatherModel(presenter : MainContract.Presenter) {
     fun updateWeather(mLocationId : String) : Disposable = RetrofitClient.retrofit().getWeather(
         mLocationId).subscribeOn(Schedulers.io()).observeOn(
         AndroidSchedulers.mainThread()).subscribe({
+        Log.e("TAG","update")
                                                       mPresenter.onWeatherBean(it)
                                                       mPresenter.setDefaultId(mLocationId)
                                                       /*将请求的数据保存，以便下次直接获取*/
@@ -28,7 +30,10 @@ class WeatherModel(presenter : MainContract.Presenter) {
                                                       PreferenceUtil.get().putString(
                                                           Constants.MAIN_PAGE_WEATHER, toJson)
                                                       PreferenceUtil.get().apply()
-                                                  }, { mPresenter.onWeatherBean(null) })
+                                                  }, {
+        Log.e("TAG","e = ${it.message}")
+        mPresenter.onWeatherBean(null)
+    })
 
     fun getDefaultWeather():WeatherBean? {
 

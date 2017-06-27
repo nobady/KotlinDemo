@@ -10,6 +10,7 @@ import com.afsw.kotlindemo.base.BaseAdapter
 import com.afsw.kotlindemo.base.BaseViewHolder
 import com.afsw.kotlindemo.bean.SelectCityBean
 import com.afsw.kotlindemo.utils.Constants
+import com.afsw.kotlindemo.utils.PreferenceUtil
 import com.afsw.kotlindemo.utils.UIUtil
 
 /**
@@ -20,8 +21,8 @@ class CityAdapter() : BaseAdapter<SelectCityBean>() {
     var isDelete : Boolean = false
 
     init {
-        addItemLayout(0, R.layout.item_followed_city)
-        addItemLayout(1, R.layout.item_add_city)
+        addItemLayout(1, R.layout.item_followed_city)
+        addItemLayout(2, R.layout.item_add_city)
     }
 
     override fun converts(holder : BaseViewHolder?, data : SelectCityBean) {
@@ -42,23 +43,27 @@ class CityAdapter() : BaseAdapter<SelectCityBean>() {
                     getView<TextView>(R.id.city_status).setCompoundDrawables(drawable, null, null,
                                                                              null)
 
+
                     /*显示删除按钮和背景*/
                     getView<ImageView>(
                         R.id.delete).visibility = if (isDelete) View.VISIBLE else View.GONE
-                    getView<View>(R.id.hover).visibility = if (isDelete) View.VISIBLE else View.GONE
+                    getView<View>(
+                        R.id.hover).visibility = if (isDelete) View.VISIBLE else View.GONE
                     /*显示当前展示天气的城市的标记*/
-                    getView<ImageView>(R.id.checked).visibility = if (data.cityName.equals(
-                        "")) View.VISIBLE else View.GONE
+                    getView<ImageView>(
+                        R.id.checked).visibility = if (data.cityName == PreferenceUtil.get().getString(
+                        Constants.CURR_CITY)) View.VISIBLE else View.GONE
 
                     /*给itemview设置长按事件*/
-                    itemView.setOnLongClickListener {
+                    getView<RelativeLayout>(R.id.content).setOnLongClickListener {
                         isDelete = !isDelete
-                        notifyDataSetChanged()
-                        false
+                        notifyItemChanged(layoutPosition)
+                        true
                     }
 
                     getView<ImageView>(R.id.delete).setOnClickListener {
                         /*如果删除的是当前正在显示的城市，那么就切换到第一个城市*/
+                        /*如果只有一个城市了，就不能删除*/
                         datas!!.removeAt(layoutPosition)
                     }
 
@@ -84,7 +89,8 @@ class CityAdapter() : BaseAdapter<SelectCityBean>() {
     }
 
     override fun getItemViewType(position : Int) : Int {
-        if (datas != null && position == datas!!.size - 1) return 1
-        else return 0
+        if (datas != null && position == datas!!.size - 1) return 2
+        else return 1
     }
+
 }

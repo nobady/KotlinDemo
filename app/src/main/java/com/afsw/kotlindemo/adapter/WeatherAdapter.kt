@@ -10,9 +10,7 @@ import com.afsw.kotlindemo.bean.WeatherBean
  * Created by tengfei.lv on 2017/6/14.
  */
 class WeatherAdapter:RecyclerView.Adapter<RecyclerView.ViewHolder>() {
-    override fun getItemCount() : Int {
-        return 3
-    }
+    override fun getItemCount() : Int  = 3
 
     var weatherBean:WeatherBean? = null
 

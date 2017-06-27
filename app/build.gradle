@@ -30,10 +30,11 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.key
         }
-        debug{
+        debug {
             signingConfig signingConfigs.key
         }
     }
+
 
     sourceSets {
         main {
@@ -58,17 +59,17 @@ dependencies {
     compile "io.reactivex.rxjava2:rxjava:$rxjava_version"
 
     //4.0-5.5沉浸式状态栏
+
+    /*汉字转拼音*/
+
+
     compile 'com.android.support:appcompat-v7:25.3.1'
     compile 'com.android.support:design:25.3.1'
     compile 'com.readystatesoftware.systembartint:systembartint:1.0.3'
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
-    testCompile 'junit:junit:4.12'
-
-    /*汉字转拼音*/
     compile 'com.github.promeg:tinypinyin:1.0.0'
-
-
     compile 'com.github.SilenceDut:ExpandableLayout:1.2.0'
+    testCompile 'junit:junit:4.12'
 }
 repositories {
     mavenCentral()

@@ -17,8 +17,10 @@ abstract class BaseMvpFragment<V:BaseView,P : BasePresenter<V>> : BaseFragment()
 
         presenter.attachView(this as V)
 
-        return super.onCreateView(inflater, container, savedInstanceState)
+        return inflater?.inflate(getLayoutId(),container,false)
     }
+
+    abstract fun getLayoutId():Int
 
     abstract fun createPresenter() : P
 

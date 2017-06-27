@@ -3,7 +3,6 @@ package com.afsw.kotlindemo.ui.fragment
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -33,7 +32,6 @@ class WeatherFragment: BaseFragment() {
         recyclerView = view.findViewById(R.id.recyclerView) as RecyclerView
         recyclerView.layoutManager = LinearLayoutManager(context)
         recyclerView.setBackgroundResource(R.color.dark_background)
-        Log.e("TAG","pppp")
         adapter = WeatherAdapter()
         mWeatherBean?.let { adapter.setBean(mWeatherBean!!) }
         recyclerView.adapter = adapter
@@ -47,7 +45,6 @@ class WeatherFragment: BaseFragment() {
         }
 
         weatherBean?.let {
-            Log.e("TAG","wwww")
             adapter.setBean(it)
             adapter.notifyDataSetChanged()
         }

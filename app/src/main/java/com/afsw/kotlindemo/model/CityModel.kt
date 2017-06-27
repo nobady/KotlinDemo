@@ -1,6 +1,7 @@
 package com.afsw.kotlindemo.model
 
 import android.content.Context
+import android.util.Log
 import com.afsw.kotlindemo.contract.MainContract
 import com.afsw.kotlindemo.manager.DBManager
 import com.afsw.kotlindemo.utils.Constants
@@ -10,7 +11,6 @@ import com.baidu.location.BDLocation
 import com.baidu.location.BDLocationListener
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.functions.Consumer
 
 /**
  * 获取城市的数据模型
@@ -28,12 +28,14 @@ class CityModel(context : Context, presenter : MainContract.Presenter) : BDLocat
     init {
         mDefaultId = PreferenceUtil.get().getString(Constants.DEFAULT_CITYID, "$")
         mLocationId = PreferenceUtil.get().getString(Constants.LOCATION_ID, "$")
+        Log.e("TAG","init = $mDefaultId")
     }
 
     override fun onConnectHotSpotMessage(p0 : String?, p1 : Int) {
     }
 
     override fun onReceiveLocation(location : BDLocation?) {
+        Log.e("TAG","location")
         /*定位成功的回调*/
         mCityName = location!!.city!!.replace("市", "")
         /*根据城市名称查找到id*/
@@ -43,7 +45,7 @@ class CityModel(context : Context, presenter : MainContract.Presenter) : BDLocat
         PreferenceUtil.get().apply()
 
         /*通知p层是否定位成功*/
-        Observable.just(1).observeOn(AndroidSchedulers.mainThread()).subscribe(Consumer {
+        Observable.just(1).observeOn(AndroidSchedulers.mainThread()).subscribe( {
             mPresenter.onLocationComplete(mLocationId,
                                           location.locType == 61 || location.locType == 161)
         })
@@ -62,6 +64,7 @@ class CityModel(context : Context, presenter : MainContract.Presenter) : BDLocat
      */
     fun setDefaultID(defaultId : String) {
         mDefaultId = defaultId
+        Log.e("TAG",mDefaultId)
         PreferenceUtil.get().putString(Constants.DEFAULT_CITYID, mDefaultId)
         PreferenceUtil.get().apply()
     }

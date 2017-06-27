@@ -4,6 +4,7 @@ import android.content.Context
 import com.afsw.kotlindemo.bean.AssetsCityBean
 import com.afsw.kotlindemo.bean.CityInfoEntity
 import com.afsw.kotlindemo.db.CityDbEntity
+import com.afsw.kotlindemo.db.SelectCityDBEntity
 import com.afsw.kotlindemo.utils.Constants
 import com.afsw.kotlindemo.utils.FileUtil
 import com.afsw.kotlindemo.utils.PreferenceUtil
@@ -26,6 +27,9 @@ class DBManager private constructor(){
         var instance = DBManager()
     }
 
+    /**
+     * 将assets里面的城市列表copy到数据库中，在城市列表中需要使用
+     */
     fun copyFileToDB(context: Context){
         val isInDB = PreferenceUtil.get().getBoolean(Constants.CITY_IN_DB)
         if (isInDB) return
@@ -73,10 +77,70 @@ class DBManager private constructor(){
 
         val realm = Realm.getDefaultInstance()
 
-        val results = realm.where(CityDbEntity::class.java).equalTo("cityName", city).findAll()
+        val results = realm.where(CityDbEntity::class.java).equalTo("cityName", city).findFirst()
 
         val mutableList = realm.copyFromRealm(results)
 
-        return mutableList[0].getCityId()!!
+        realm.close()
+
+        return mutableList.getCityId()!!
     }
+    /*保存定位到的或者在城市列表中选择的城市id*/
+    fun saveCityId(cityId:String){
+
+        val realm = Realm.getDefaultInstance()
+
+        realm.executeTransaction {
+            it.createObject(SelectCityDBEntity::class.java).setCityId(cityId)
+        }
+        realm.close()
+
+    }
+    /*检查cityid是否已经存在数据库*/
+    fun checkCityIdExist(cityId:String):Boolean{
+
+        val realm = Realm.getDefaultInstance()
+
+        val cityDBEntity = realm.where(SelectCityDBEntity::class.java).equalTo("cityId",
+                                                                               cityId).findFirst()
+        /*如果不为空，就返回true*/
+        cityDBEntity?.let { return true }
+
+        return false
+    }
+    /*查找已经保存的城市*/
+    fun findSaveCity() : MutableList<SelectCityDBEntity>? {
+
+        val realm = Realm.getDefaultInstance()
+
+        val results = realm.where(SelectCityDBEntity::class.java).findAll()
+
+        val mutableList = realm.copyFromRealm(results)
+
+        return mutableList
+    }
+
+    /*获取所有的城市*/
+    fun findAllCitys():MutableList<CityDbEntity>{
+
+        val realm = Realm.getDefaultInstance()
+
+        val results = realm.where(CityDbEntity::class.java).findAll()
+
+        val mutableList = realm.copyFromRealm(results)
+
+        var firstPinyin:String = ""
+
+        mutableList.forEach {
+            var c = it.getCitPinyin()?.substring(0, 1)
+
+            if (c!=firstPinyin){
+                it.firstPinYin = c
+                firstPinyin = c!!
+            }
+        }
+
+        return mutableList
+    }
+
 }

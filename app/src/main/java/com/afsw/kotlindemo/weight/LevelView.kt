@@ -14,7 +14,7 @@ import com.afsw.kotlindemo.utils.UIUtil
 /**
  * Created by tengfei.lv on 2017/6/15.
  */
-class LevelView(context:Context):View(context) {
+class LevelView(context:Context,attrs : AttributeSet):View(context,attrs) {
 
     private val COlORS_ID = intArrayOf(R.color.green500, R.color.yellow500, R.color.orange500,
                                        R.color.red400, R.color.purple500, R.color.red900)
@@ -40,9 +40,6 @@ class LevelView(context:Context):View(context) {
     fun setAQI_LEVELS(levels:IntArray){
         AQI_LEVELS = levels
     }
-
-
-    constructor(context : Context, attrs : AttributeSet?):this(context)
 
     override fun onSizeChanged(w : Int, h : Int, oldw : Int, oldh : Int) {
         super.onSizeChanged(w, h, oldw, oldh)

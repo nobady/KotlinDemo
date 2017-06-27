@@ -7,6 +7,7 @@ import com.afsw.kotlindemo.base.BaseView
 import com.afsw.kotlindemo.bean.BasicEntity
 import com.afsw.kotlindemo.bean.HoursForecastEntity
 import com.afsw.kotlindemo.bean.WeatherBean
+import com.afsw.kotlindemo.manager.DBManager
 import com.afsw.kotlindemo.model.CityModel
 import com.afsw.kotlindemo.model.WeatherModel
 import com.afsw.kotlindemo.utils.Constants
@@ -39,6 +40,7 @@ interface MainContract {
         }
 
         fun onLocationComplete(mLocationId : String, success : Boolean) {
+            Log.e("TAG", "mLocationId = $mLocationId   $success")
             if (!success&&mCityModel.noDefaultCity()){
                 view?.locationFail()
                 return
@@ -46,6 +48,20 @@ interface MainContract {
             /*如果没有默认城市或者是默认的城市不是定位到的城市，那么就请求*/
             if (mCityModel.noDefaultCity()||!mCityModel.mDefaultId.equals(mLocationId)){
                 getWeather(mLocationId)
+            }
+        }
+
+        fun getDefaultWeather(){
+            val weatherBean = weatherModel.getDefaultWeather()
+            weatherBean?.let {
+                onWeatherBean(it)
+            }
+//            updateDefaultWeather()
+        }
+
+        fun updateDefaultWeather(){
+            if (mCityModel.mDefaultId!="$"){
+                getWeather(mCityModel.mDefaultId)
             }
         }
 
@@ -58,15 +74,6 @@ interface MainContract {
             mCompositeDisposable!!.add(weatherModel.updateWeather(mLocationId))
         }
 
-        fun getDefaultWeather(){
-            val weatherBean = weatherModel.getDefaultWeather()
-
-            weatherBean?.let {
-                Log.e("TAG","Bean = $it")
-                onWeatherBean(it)
-            }
-
-        }
 
         /**
          * 如果参数为null，说明更新失败
@@ -76,10 +83,17 @@ interface MainContract {
             weatherBean?:let { view?.setRefreshing(false) }
             weatherBean?.let { (cityId, basic, aqi, hoursForecast, dailyForecast, lifeIndex) ->
 
+                /*将cityid保存到数据库中，先检测是否已经存在*/
+
                 val isLocationCity = cityId.equals(
                     PreferenceUtil.get().getString(Constants.LOCATION_ID, "$"))
                 view!!.onBasicInfo(basic, hoursForecast, isLocationCity)
                 view!!.onMoreInfo(weatherBean)
+
+                if (!DBManager.get().checkCityIdExist(cityId)) {
+                    /*不存在数据库中，添加*/
+                    DBManager.get().saveCityId(cityId)
+                }
             }
         }
 
