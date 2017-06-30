@@ -4,6 +4,8 @@ import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
+import android.app.Activity
+import android.content.Intent
 import android.graphics.Rect
 import android.graphics.drawable.Drawable
 import android.os.Bundle
@@ -223,7 +225,7 @@ class MainActivity : BaseMvpActivity<MainContract.View, MainContract.Presenter>(
     override fun locationFail() {
         toast(getString(R.string.located_failed), Toast.LENGTH_SHORT)
         //跳转到城市列表页面
-
+        startActivityForResult(Intent(this,SearchCityActivity::class.java),1)
     }
 
     /**
@@ -277,6 +279,8 @@ class MainActivity : BaseMvpActivity<MainContract.View, MainContract.Presenter>(
         } else {
             mMainBgIv.setImageResource(R.mipmap.bg_day)
         }
+
+        cityFragment.findCitys()
     }
     /*更新成功后，使用动画设置发布时间*/
     private fun updateSuccess(time : String) {
@@ -307,6 +311,14 @@ class MainActivity : BaseMvpActivity<MainContract.View, MainContract.Presenter>(
         mActionRotate.removeAllListeners()
         mSuccessAnimator?.removeAllUpdateListeners()
         mActionRotate.removeAllUpdateListeners()
+    }
+
+    override fun onActivityResult(requestCode : Int, resultCode : Int, data : Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if(requestCode==1&&resultCode== Activity.RESULT_OK){
+            val cityId = data?.getStringExtra(Constants.SELECT_CITY_ID)
+            presenter.getWeather(cityId!!)
+        }
     }
 }
 

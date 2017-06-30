@@ -40,7 +40,6 @@ interface MainContract {
         }
 
         fun onLocationComplete(mLocationId : String, success : Boolean) {
-            Log.e("TAG", "mLocationId = $mLocationId   $success")
             if (!success&&mCityModel.noDefaultCity()){
                 view?.locationFail()
                 return
@@ -68,7 +67,7 @@ interface MainContract {
         /**
          * 根据天气id获取天气
          */
-        private fun getWeather(mLocationId : String) {
+         fun getWeather(mLocationId : String) {
             view!!.setRefreshing(true)
 
             mCompositeDisposable!!.add(weatherModel.updateWeather(mLocationId))
@@ -92,6 +91,7 @@ interface MainContract {
 
                 if (!DBManager.get().checkCityIdExist(cityId)) {
                     /*不存在数据库中，添加*/
+                    Log.e("TAG","添加")
                     DBManager.get().saveCityId(cityId)
                 }
             }

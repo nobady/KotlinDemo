@@ -21,8 +21,11 @@ class Constants {
         val DEFAULT_CITYID = "DEFAULT_CITY_ID"
         val FOLLOWED_CITIES = "FOLLOWED_CITIES"
         val DEFAULT_CITY_ID = "101220901"//亳州CityId
+        val  LOCATION_NAME  = "LOCATION_NAME"
 
         val CURR_CITY : String = "curr_city"
+        /*从选择城市页面中选择的城市id的标识*/
+        val SELECT_CITY_ID = "select_city_id"
 
         val DEFAULT_STR = "$"
 
@@ -81,6 +84,7 @@ class Constants {
 
             return R.mipmap.weather_none_available
         }
+
 
     }
 

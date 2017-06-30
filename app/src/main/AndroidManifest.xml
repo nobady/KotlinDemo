@@ -47,7 +47,8 @@
             android:name="com.baidu.lbsapi.API_KEY"
             android:value="VfNeGf2AnQbFisbicBa0HjnIlT8HTSnC"/>
 
-        <activity android:name=".ui.SearchCityActivity">
+        <activity android:name=".ui.SearchCityActivity"
+            android:windowSoftInputMode="adjustPan">
         </activity>
     </application>
 

@@ -1,5 +1,7 @@
 package com.afsw.kotlindemo.adapter
 
+import android.app.Activity
+import android.content.Intent
 import android.graphics.Rect
 import android.view.View
 import android.widget.ImageView
@@ -9,6 +11,7 @@ import com.afsw.kotlindemo.R
 import com.afsw.kotlindemo.base.BaseAdapter
 import com.afsw.kotlindemo.base.BaseViewHolder
 import com.afsw.kotlindemo.bean.SelectCityBean
+import com.afsw.kotlindemo.ui.SearchCityActivity
 import com.afsw.kotlindemo.utils.Constants
 import com.afsw.kotlindemo.utils.PreferenceUtil
 import com.afsw.kotlindemo.utils.UIUtil
@@ -16,9 +19,11 @@ import com.afsw.kotlindemo.utils.UIUtil
 /**
  * Created by tengfei.lv on 2017/6/12.
  */
-class CityAdapter() : BaseAdapter<SelectCityBean>() {
+class CityAdapter(activity : Activity) : BaseAdapter<SelectCityBean>() {
     /*标记是否需要删除*/
     var isDelete : Boolean = false
+
+    val mActivity = activity
 
     init {
         addItemLayout(1, R.layout.item_followed_city)
@@ -47,8 +52,7 @@ class CityAdapter() : BaseAdapter<SelectCityBean>() {
                     /*显示删除按钮和背景*/
                     getView<ImageView>(
                         R.id.delete).visibility = if (isDelete) View.VISIBLE else View.GONE
-                    getView<View>(
-                        R.id.hover).visibility = if (isDelete) View.VISIBLE else View.GONE
+                    getView<View>(R.id.hover).visibility = if (isDelete) View.VISIBLE else View.GONE
                     /*显示当前展示天气的城市的标记*/
                     getView<ImageView>(
                         R.id.checked).visibility = if (data.cityName == PreferenceUtil.get().getString(
@@ -83,14 +87,20 @@ class CityAdapter() : BaseAdapter<SelectCityBean>() {
             2 -> {
                 holder.getView<ImageView>(R.id.image).setOnClickListener {
                     /*跳转到城市列表页面*/
+                    mActivity.startActivityForResult(
+                        Intent(mActivity, SearchCityActivity::class.java),1)
                 }
             }
         }
     }
 
     override fun getItemViewType(position : Int) : Int {
-        if (datas != null && position == datas!!.size - 1) return 2
+        if (datas != null && position == datas!!.size ) return 2
         else return 1
+    }
+
+    override fun getItemCount() : Int {
+        return super.getItemCount()+1
     }
 
 }

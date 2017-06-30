@@ -24,7 +24,7 @@ interface CityContract {
         val selectCityBeanList : MutableList<SelectCityBean> = ArrayList()
 
         fun findSaveCity() {
-
+            selectCityBeanList.clear()
             /*查找数据库中保存的city*/
             val cityIdList = DBManager.get().findSaveCity()
 
@@ -34,10 +34,11 @@ interface CityContract {
                     getWeatherInfoFromCityId(t!!.getCityId()!!, it.indexOf(t))
                 }.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe({
                                 selectCityBeanList.add(it)
-                                Log.e("TAG","view = ${view==null}")
+                                Log.e("TAG","it = $it")
+
                                 view?.showDatas(selectCityBeanList)
                             }, {
-                    Log.e("TAG","E = $it")
+                    Log.e("TAG","CityContract  E = $it")
                 })
 
             }

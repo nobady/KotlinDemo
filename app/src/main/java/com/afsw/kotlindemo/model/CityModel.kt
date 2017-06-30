@@ -28,20 +28,19 @@ class CityModel(context : Context, presenter : MainContract.Presenter) : BDLocat
     init {
         mDefaultId = PreferenceUtil.get().getString(Constants.DEFAULT_CITYID, "$")
         mLocationId = PreferenceUtil.get().getString(Constants.LOCATION_ID, "$")
-        Log.e("TAG","init = $mDefaultId")
     }
 
     override fun onConnectHotSpotMessage(p0 : String?, p1 : Int) {
     }
 
     override fun onReceiveLocation(location : BDLocation?) {
-        Log.e("TAG","location")
         /*定位成功的回调*/
         mCityName = location!!.city!!.replace("市", "")
         /*根据城市名称查找到id*/
         mLocationId = DBManager.get().getCityId(mCityName)
         /*将定位到的城市id保存在sp中*/
         PreferenceUtil.get().putString(Constants.LOCATION_ID, mLocationId)
+        PreferenceUtil.get().putString(Constants.LOCATION_NAME, mCityName)
         PreferenceUtil.get().apply()
 
         /*通知p层是否定位成功*/

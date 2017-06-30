@@ -3,7 +3,6 @@ package com.afsw.kotlindemo.ui.fragment
 import android.os.Bundle
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.RecyclerView
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -47,16 +46,16 @@ class CityFragment: BaseMvpFragment<CityContract.View,CityContract.Presenter>(),
         mRecyclerView.setHasFixedSize(true)
         mRecyclerView.setBackgroundResource(R.color.main_background)
 
-        Log.e("TAG", "onViewCreated")
-        mAdapter = CityAdapter()
+        mAdapter = CityAdapter(activity)
         mRecyclerView.adapter = mAdapter
 
+    }
+
+    fun findCitys(){
         presenter.findSaveCity()
     }
 
     override fun showDatas(selectCityBeanList : MutableList<SelectCityBean>) {
-        Log.e("TAG", "显示")
-        selectCityBeanList.add(SelectCityBean("0","","","",0))
         mAdapter.datas = selectCityBeanList
         mAdapter.notifyDataSetChanged()
     }

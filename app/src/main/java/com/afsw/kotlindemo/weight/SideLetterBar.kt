@@ -5,6 +5,7 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.util.AttributeSet
+import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 import android.widget.TextView
@@ -57,8 +58,8 @@ class SideLetterBar(context : Context, attributeSet : AttributeSet?) : View(cont
         when(event?.action){
             MotionEvent.ACTION_DOWN,MotionEvent.ACTION_MOVE-> {
                 /*根据点击的位置获取点击的字母，因为是强转为int，所以有可能不是很准确*/
-                val index = (y * INITIAL.size / height).toInt()
-
+                var index = (event.y * INITIAL.size / height).toInt()
+                Log.e("SideLetterBar TAG","$index")
                 if (index>=2&&index< INITIAL.size){
                     overlay?.let {
                         overlay?.visibility = VISIBLE
